@@ -1,8 +1,12 @@
 import time
 user_list = []
 user_token_id = 0
+def display_queue_details():
+	print('The current id is {id}'.format(id = user_list[0]))
+	return 1
 class user(object):
 	user_name = ""
+	request_type = ""
 	def initiate_user_request():
 		user_name = input('Enter your name')
 		request_type = input('Enter your request type')
