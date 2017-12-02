@@ -10,6 +10,39 @@ if(!isset($_SESSION["token"]) || !isset($_SESSION["name"]))
 if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
   $username = $_SESSION["name"];
   $current_token_id = $_SESSION["token"];
+  
+ /* $request_teller_1 = 0;
+  $request_teller_2 = 0;
+  $request_teller_3 = 0;
+  $request_teller_4 = 0;
+
+  $request_1 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=1");
+  $request_1->execute();
+  $row1=$request_1->fetch();
+  $request_teller_1 = $row1['total_donors'];
+
+  $request_1 = $con->prepare("SELECT * FROM request_queue WHERE teller_id=1");
+  $request_1->execute();
+  $current_token_id_teller1 = 
+
+
+
+  $request_2 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=2");
+  $request_2->execute();
+  $row2=$request_2->fetch();
+  $request_teller_2 = $row2['total_donors'];
+  
+  $request_3 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=3");
+  $request_3->execute();
+  $row3=$request_3->fetch();
+  $request_teller_3 = $row3['total_donors'];
+
+  $request_4 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=4");
+  $request_4->execute();
+  $row4=$request_4->fetch();
+  $request_teller_4 = $row4['total_donors'];*/
+
+
   /*$result = $con->prepare("SELECT * FROM users WHERE user_id ='".$_SESSION["Username"]."' AND password = '".$_SESSION["Password"]."'");
   $result->execute();
   $row = $result->fetch();
@@ -201,11 +234,9 @@ if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
 										</div>
 									</div>
 								</section>
-
-								<a class="mb-xs mt-xs mr-xs modal-basic btn btn-success" href="#modalHeaderColorSuccess">Request Now</a>
-
-
-
+								<form>
+									<input type="button" class="mb-xs mt-xs mr-xs modal-basic btn btn-success" name="teller_1" type="submit" value="Request">
+								</form>
 							</div>
 
 						</section>
@@ -238,8 +269,6 @@ if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
 						</footer>
 					</section>
 				</div>
-
-				
 				<!-- end: page -->
 			</section>
 		</div>		
