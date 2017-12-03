@@ -1,0 +1,43 @@
+  $request_teller_1 = 0;
+  $request_teller_2 = 0;
+  $request_teller_3 = 0;
+  $request_teller_4 = 0;
+
+  $request_1 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=1");
+  $request_1->execute();
+  $row1=$request_1->fetch();
+  $request_teller_1 = $row1['total_donors'];
+
+  $request_1 = $con->prepare("SELECT * FROM request_queue WHERE teller_id= 1 ORDER BY 'timestamp' DESC LIMIT 2");
+  $request_1->execute();
+  $row1 = $request_1->fetc();
+  print_r($row1);
+  //$current_token_id_teller1 = $row[] 
+
+
+  /*
+
+  $request_2 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=2");
+  $request_2->execute();
+  $row2=$request_2->fetch();
+  $request_teller_2 = $row2['total_donors'];
+  
+  $request_3 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=3");
+  $request_3->execute();
+  $row3=$request_3->fetch();
+  $request_teller_3 = $row3['total_donors'];
+
+  $request_4 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=4");
+  $request_4->execute();
+  $row4=$request_4->fetch();
+  $request_teller_4 = $row4['total_donors'];
+
+  $result = $con->prepare("SELECT * FROM users WHERE user_id ='".$_SESSION["Username"]."' AND password = '".$_SESSION["Password"]."'");
+
+  $result->execute();
+  $row = $result->fetch();
+  $result2 = $con->prepare("SELECT * FROM transactions WHERE user_id ='".$_SESSION["Username"]."' AND status = 'completed' ORDER BY timestamp DESC LIMIT 1");
+  $result2->execute();
+  $row2 = $result2->fetch();
+}
+*/
