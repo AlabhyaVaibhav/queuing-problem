@@ -13,7 +13,8 @@ if (isset($_POST['token']))
 	if($row>0){
 		$_SESSION['token'] = $row['token'];
 		$_SESSION['name'] = $row['full_name'];
-		$_SESSION['pnum'] = $row['phone_number'];     
+		$_SESSION['pnum'] = $row['phone_number'];
+		$_SESSION['email'] = $row['email'];   
 		echo $tokenid;
 		sleep(3);
 		header("location:user_profile.php");

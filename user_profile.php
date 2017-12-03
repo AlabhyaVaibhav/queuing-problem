@@ -3,53 +3,46 @@ session_start();
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 'On');  //On or Off
 include('connect.php');
-
 if(!isset($_SESSION["token"]) || !isset($_SESSION["name"]))
-  header("location:login.php");
+	header("location:login.php");
 
 if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
-  $username = $_SESSION["name"];
-  $current_token_id = $_SESSION["token"];
-  
- /* $request_teller_1 = 0;
-  $request_teller_2 = 0;
-  $request_teller_3 = 0;
-  $request_teller_4 = 0;
-
-  $request_1 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=1");
-  $request_1->execute();
-  $row1=$request_1->fetch();
-  $request_teller_1 = $row1['total_donors'];
-
-  $request_1 = $con->prepare("SELECT * FROM request_queue WHERE teller_id=1");
-  $request_1->execute();
-  $current_token_id_teller1 = 
-
-
-
-  $request_2 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=2");
-  $request_2->execute();
-  $row2=$request_2->fetch();
-  $request_teller_2 = $row2['total_donors'];
-  
-  $request_3 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=3");
-  $request_3->execute();
-  $row3=$request_3->fetch();
-  $request_teller_3 = $row3['total_donors'];
-
-  $request_4 = $con->prepare("SELECT COUNT(*) AS total_request FROM request_queue WHERE teller_id=4");
-  $request_4->execute();
-  $row4=$request_4->fetch();
-  $request_teller_4 = $row4['total_donors'];*/
-
-
-  /*$result = $con->prepare("SELECT * FROM users WHERE user_id ='".$_SESSION["Username"]."' AND password = '".$_SESSION["Password"]."'");
-  $result->execute();
-  $row = $result->fetch();
-  $result2 = $con->prepare("SELECT * FROM transactions WHERE user_id ='".$_SESSION["Username"]."' AND status = 'completed' ORDER BY timestamp DESC LIMIT 1");
-  $result2->execute();
-  $row2 = $result2->fetch();
-*/
+	$username = $_SESSION["name"];
+	$current_token_id = $_SESSION["token"];
+}
+if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
+	$full_name = $username;
+	$phone_number = $_SESSION['pnum'];
+	$token = md5(uniqid(rand(), true));
+	if (!empty($_POST["request_teller_1"])) {
+		$teller_id = $_POST['request_teller_1'];       
+	}
+	elseif (!empty($_POST["request_teller_2"])) {
+		$teller_id = $_POST['request_teller_2'];       
+	}
+	else{
+		$teller_id = 0;       
+	}
+	$request = $con->prepare("SELECT * FROM request_queue WHERE teller_id= 1 && request_status = 0 ORDER BY 'timestamp' DESC");
+	$request->execute();
+	$row1 = $request->fetch();
+	if ($row1>0) {
+		echo '<script type="text/javascript">alert("You have alredy made a request knidly wait for your turn");</script>';
+	}
+	else{
+		$sql = "INSERT request_queue SET 
+		full_name = :name,          
+		phone_number = :pnum,
+		token = :gentoken,
+		teller_id = :tellerid";
+		$stmt = $con->prepare($sql); 
+		$stmt->bindParam(':name', $full_name,PDO::PARAM_STR);   
+		$stmt->bindParam(':pnum', $phone_number,PDO::PARAM_STR);
+		$stmt->bindParam(':gentoken', $token,PDO::PARAM_STR);
+		$stmt->bindParam(':tellerid', $teller_id,PDO::PARAM_STR); 
+		$stmt->execute();
+	}
+	
 }
 
 ?>
@@ -98,90 +91,90 @@ if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
 	<section class="body">
 
 		<!-- start: header -->
-			<header class="header">
-				<div class="logo-container">
-					<a href="../" class="logo">
-						LOGO OF THE BANK
-						<!-- IMAGE -->
-					</a>
-					
-				</div>
+		<header class="header">
+			<div class="logo-container">
+				<a href="../" class="logo">
+					LOGO OF THE BANK
+					<!-- IMAGE -->
+				</a>
+				
+			</div>
 
 			
-				<!-- start: search & user box -->
-				<div class="header-right">
-					<div class="btn-group">
-												<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-												<ul class="dropdown-menu" role="menu">
-													<li><a href="#">Action</a></li>
-													<li><a href="#">Another action</a></li>
-													<li><a href="#">Something else here</a></li>
-													<li class="divider"></li>
-													<li><a href="#">Separated link</a></li>
-												</ul>
-											</div>
-											<div class="btn-group">
-												<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-												<ul class="dropdown-menu" role="menu">
-													<li><a href="#">Action</a></li>
-													<li><a href="#">Another action</a></li>
-													<li><a href="#">Something else here</a></li>
-													<li class="divider"></li>
-													<li><a href="#">Separated link</a></li>
-												</ul>
-											</div>
-											<div class="btn-group">
-												<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-												<ul class="dropdown-menu" role="menu">
-													<li><a href="#">Action</a></li>
-													<li><a href="#">Another action</a></li>
-													<li><a href="#">Something else here</a></li>
-													<li class="divider"></li>
-													<li><a href="#">Separated link</a></li>
-												</ul>
-											</div>
-											<div class="btn-group">
-												<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-												<ul class="dropdown-menu" role="menu">
-													<li><a href="#">Action</a></li>
-													<li><a href="#">Another action</a></li>
-													<li><a href="#">Something else here</a></li>
-													<li class="divider"></li>
-													<li><a href="#">Separated link</a></li>
-												</ul>
-											</div>
-					<span class="separator"></span>
-			
-					<div id="userbox" class="userbox">
-						<a href="#" data-toggle="dropdown">
-							
-							<div class="profile-info" data-lock-name="John Doe" data-lock-email="johndoe@okler.com">
-								<span class="name"><?php echo $username; ?></span>
-								<span class="role">Token Number: <?php echo $current_token_id; ?></span>
-							</div>
-			
-							<i class="fa custom-caret"></i>
-						</a>
-			
-						<div class="dropdown-menu">
-							<ul class="list-unstyled">
-								<li class="divider"></li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="fa fa-user"></i> My Profile</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="#" data-lock-screen="true"><i class="fa fa-lock"></i> Lock Screen</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="pages-signin.html"><i class="fa fa-power-off"></i> Logout</a>
-								</li>
-							</ul>
+			<!-- start: search & user box -->
+			<div class="header-right">
+				<div class="btn-group">
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Action</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Separated link</a></li>
+					</ul>
+				</div>
+				<span class="separator"></span>
+				
+				<div id="userbox" class="userbox">
+					<a href="#" data-toggle="dropdown">
+						
+						<div class="profile-info" data-lock-name="John Doe" data-lock-email="johndoe@okler.com">
+							<span class="name"><?php echo $username; ?></span>
+							<span class="role">Token Number: <?php echo $current_token_id; ?></span>
 						</div>
+						
+						<i class="fa custom-caret"></i>
+					</a>
+					
+					<div class="dropdown-menu">
+						<ul class="list-unstyled">
+							<li class="divider"></li>
+							<li>
+								<a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="fa fa-user"></i> My Profile</a>
+							</li>
+							<li>
+								<a role="menuitem" tabindex="-1" href="#" data-lock-screen="true"><i class="fa fa-lock"></i> Lock Screen</a>
+							</li>
+							<li>
+								<a role="menuitem" tabindex="-1" href="pages-signin.html"><i class="fa fa-power-off"></i> Logout</a>
+							</li>
+						</ul>
 					</div>
 				</div>
-				<!-- end: search & user box -->
-			</header>
-			<!-- end: header -->
+			</div>
+			<!-- end: search & user box -->
+		</header>
+		<!-- end: header -->
 
 		<div class="inner-wrapper">
 			<!-- start: sidebar -->
@@ -234,15 +227,69 @@ if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
 										</div>
 									</div>
 								</section>
-								<form>
-									<input type="button" class="mb-xs mt-xs mr-xs modal-basic btn btn-success" name="teller_1" type="submit" value="Request">
+								<form method="POST" action="user_profile.php">
+									<button type="submit" class="btn btn-success" name="teller_1" id="teller_1">Request</button>
+									
+									<input type="hidden" name="request_teller_1" value="1">
+								</form>
+							</div>
+
+						</section>
+					</div>
+					<div class="col-md-3">
+						<section class="panel">
+							<header class="panel-heading bg-primary">
+								<div class="panel-heading-icon">
+									<i class="fa fa-globe"></i>
+								</div>
+							</header>
+							<div class="panel-body text-center">
+								<h3 class="text-weight-semibold mt-sm text-center">Counter 2</h3>
+								<p class="text-center">Description about the teller</p>
+								
+								<section class="panel">
+
+									<div class="panel-body">
+										<div class="table-responsive">
+											<table class="table table-striped mb-none">
+												<thead>
+													<tr>
+														<th>Current Token</th>
+														<th>Queue Status</th>
+														<th>Next Token</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+
+														<td>SBI1111</td>
+														<td>
+															<div class="progress progress-sm progress-half-rounded m-none mt-xs light">
+																<div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+																	6/10
+																</div>
+															</div>
+
+														</td>
+														<td>SBI2222</td>
+													</tr>
+
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</section>
+								<form method="POST" action="user_profile.php">
+									<button type="submit" class="btn btn-success" name="teller_2" id="teller_2">Request</button>
+									
+									<input type="hidden" name="request_teller_2" value="2">
 								</form>
 							</div>
 
 						</section>
 					</div>
 				</div>
-				<div id="modalHeaderColorSuccess" class="modal-block modal-header-color modal-block-success mfp-hide">
+				<!-- <div id="modalHeaderColorSuccess" class="modal-block modal-header-color modal-block-success mfp-hide">
 					<section class="panel">
 						<header class="panel-heading">
 							<h2 class="panel-title">Success!</h2>
@@ -260,44 +307,38 @@ if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
 								</div>
 							</div>
 						</div>
-						<footer class="panel-footer">
-							<div class="row">
-								<div class="col-md-12 text-right">
-									<button class="btn btn-success modal-dismiss">OK</button>
-								</div>
-							</div>
-						</footer>
-					</section>
-				</div>
-				<!-- end: page -->
-			</section>
-		</div>		
-	</section>
+					-->
+				</section>
+			</div>
+			<!-- end: page -->
+		</section>
+	</div>		
+</section>
 
-	<!-- Vendor -->
-	<script src="assets/vendor/jquery/jquery.js"></script>
-	<script src="assets/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
-	<script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
-	<script src="assets/vendor/nanoscroller/nanoscroller.js"></script>
-	<script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
-	<script src="assets/vendor/magnific-popup/magnific-popup.js"></script>
-	<script src="assets/vendor/jquery-placeholder/jquery.placeholder.js"></script>
+<!-- Vendor -->
+<script src="assets/vendor/jquery/jquery.js"></script>
+<script src="assets/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="assets/vendor/nanoscroller/nanoscroller.js"></script>
+<script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+<script src="assets/vendor/magnific-popup/magnific-popup.js"></script>
+<script src="assets/vendor/jquery-placeholder/jquery.placeholder.js"></script>
 
-	<!-- Specific Page Vendor -->
-	<script src="assets/vendor/select2/select2.js"></script>
-	<script src="assets/vendor/pnotify/pnotify.custom.js"></script>
+<!-- Specific Page Vendor -->
+<script src="assets/vendor/select2/select2.js"></script>
+<script src="assets/vendor/pnotify/pnotify.custom.js"></script>
 
-	<!-- Theme Base, Components and Settings -->
-	<script src="assets/javascripts/theme.js"></script>
+<!-- Theme Base, Components and Settings -->
+<script src="assets/javascripts/theme.js"></script>
 
-	<!-- Theme Custom -->
-	<script src="assets/javascripts/theme.custom.js"></script>
+<!-- Theme Custom -->
+<script src="assets/javascripts/theme.custom.js"></script>
 
-	<!-- Theme Initialization Files -->
-	<script src="assets/javascripts/theme.init.js"></script>
+<!-- Theme Initialization Files -->
+<script src="assets/javascripts/theme.init.js"></script>
 
 
-	<!-- Examples -->
-	<script src="assets/javascripts/ui-elements/examples.modals.js"></script>
+<!-- Examples -->
+<script src="assets/javascripts/ui-elements/examples.modals.js"></script>
 </body>
 </html>
