@@ -5,15 +5,28 @@ ini_set('display_errors', 'On');  //On or Off
 include('connect.php');
 if(!isset($_SESSION["token"]) || !isset($_SESSION["name"]))
 	header("location:login.php");
-
+$email = "";
 if(isset($_SESSION["token"]) && isset($_SESSION["name"])){
 	$username = $_SESSION["name"];
+	$email = $_SESSION["email"];
 	$current_token_id = $_SESSION["token"];
 }
+
+$token = "";
 if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 	$full_name = $username;
 	$phone_number = $_SESSION['pnum'];
-	$token = md5(uniqid(rand(), true));
+	//edit the token allowed characters
+	$length =10;
+     $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+     $codeAlphabet.= "abcdefghijklmnopqrstuvwxyz";
+     $codeAlphabet.= "0123456789";
+     $max = strlen($codeAlphabet); // edited
+
+    for ($i=0; $i < $length; $i++) {
+        $token .= $codeAlphabet[rand(0, $max-1)];
+    }
+
 	if (!empty($_POST["request_teller_1"])) {
 		$teller_id = $_POST['request_teller_1'];       
 	}
@@ -23,14 +36,23 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 	else{
 		$teller_id = 0;       
 	}
-	$request = $con->prepare("SELECT * FROM request_queue WHERE teller_id= 1 && request_status = 0 ORDER BY 'timestamp' DESC");
+
+	
+
+	// if row ==1 {
+		// $today = date("F j, Y");
+		// $todayti = date("g:i a");	
+	// } else
+	// 		fetch the timestamp of the last token from the db and add 5 min to it
+
+
+
+	$request = $con->prepare("SELECT * FROM request_queue WHERE phone_number ='".$phone_number."' ORDER BY 'timestamp' DESC");
 	$request->execute();
 	$row1 = $request->fetch();
-	if ($row1>0) {
-		echo '<script type="text/javascript">alert("You have alredy made a request knidly wait for your turn");</script>';
-	}
-	else{
-		$sql = "INSERT request_queue SET 
+
+	try {
+	   		$sql = "INSERT request_queue SET 
 		full_name = :name,          
 		phone_number = :pnum,
 		token = :gentoken,
@@ -41,6 +63,13 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 		$stmt->bindParam(':gentoken', $token,PDO::PARAM_STR);
 		$stmt->bindParam(':tellerid', $teller_id,PDO::PARAM_STR); 
 		$stmt->execute();
+
+	} catch (PDOException $e) {
+	   if ($e->errorInfo[1] == 1062) {
+	      	echo '<script type="text/javascript">alert("You have alredy made a request knidly wait for your turn");</script>';
+	   } else {
+	      	echo '<script type="text/javascript">alert("Error");</script>';
+	   }
 	}
 	
 }
@@ -104,44 +133,17 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 			<!-- start: search & user box -->
 			<div class="header-right">
 				<div class="btn-group">
-					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">Action</a></li>
-						<li><a href="#">Another action</a></li>
-						<li><a href="#">Something else here</a></li>
-						<li class="divider"></li>
-						<li><a href="#">Separated link</a></li>
-					</ul>
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default" >Contact Us</button>
 				</div>
 				<div class="btn-group">
-					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">Action</a></li>
-						<li><a href="#">Another action</a></li>
-						<li><a href="#">Something else here</a></li>
-						<li class="divider"></li>
-						<li><a href="#">Separated link</a></li>
-					</ul>
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default" >Notifications</button>
 				</div>
 				<div class="btn-group">
-					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">Action</a></li>
-						<li><a href="#">Another action</a></li>
-						<li><a href="#">Something else here</a></li>
-						<li class="divider"></li>
-						<li><a href="#">Separated link</a></li>
-					</ul>
-				</div>
-				<div class="btn-group">
-					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Default <span class="caret"></span></button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#">Action</a></li>
-						<li><a href="#">Another action</a></li>
-						<li><a href="#">Something else here</a></li>
-						<li class="divider"></li>
-						<li><a href="#">Separated link</a></li>
-					</ul>
+					<button type="button" class="mb-xs mt-xs mr-xs btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">About Us<span class="caret"></span></button>
+												<ul class="dropdown-menu" role="menu">
+													<li><a href="team.php">Team</a></li>
+													<li><a href="about.php">Project</a></li>
+												</ul>
 				</div>
 				<span class="separator"></span>
 				
@@ -150,9 +152,9 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 						
 						<div class="profile-info" data-lock-name="John Doe" data-lock-email="johndoe@okler.com">
 							<span class="name"><?php echo $username; ?></span>
-							<span class="role">Token Number: <?php echo $current_token_id; ?></span>
+							<!-- <span class="role">Token Number: <?php echo $current_token_id; ?></span> -->
+							<span class="role">Appointment Time: </span>
 						</div>
-						
 						<i class="fa custom-caret"></i>
 					</a>
 					
@@ -161,9 +163,6 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 							<li class="divider"></li>
 							<li>
 								<a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="fa fa-user"></i> My Profile</a>
-							</li>
-							<li>
-								<a role="menuitem" tabindex="-1" href="#" data-lock-screen="true"><i class="fa fa-lock"></i> Lock Screen</a>
 							</li>
 							<li>
 								<a role="menuitem" tabindex="-1" href="pages-signin.html"><i class="fa fa-power-off"></i> Logout</a>
@@ -228,8 +227,8 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 									</div>
 								</section>
 								<form method="POST" action="user_profile.php">
-									<button type="submit" class="btn btn-success" name="teller_1" id="teller_1">Request</button>
-									
+									<button name="teller_1" class="mb-xs mt-xs mr-xs modal-basic btn btn-success" href="#modalHeaderColorSuccess" id="teller_1">Request Now</button>
+
 									<input type="hidden" name="request_teller_1" value="1">
 								</form>
 							</div>
@@ -289,7 +288,7 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 						</section>
 					</div>
 				</div>
-				<!-- <div id="modalHeaderColorSuccess" class="modal-block modal-header-color modal-block-success mfp-hide">
+				<div id="modalHeaderColorSuccess" class="modal-block modal-header-color modal-block-success mfp-hide">
 					<section class="panel">
 						<header class="panel-heading">
 							<h2 class="panel-title">Success!</h2>
@@ -301,44 +300,52 @@ if(isset($_POST["request_teller_1"]) || isset($_POST["request_teller_2"])){
 								</div>
 								<div class="modal-text">
 									<p><h4>Success</h4></p>
-									<p>Your Token No. : <b>SBI1111</b></p>
-									<p>Scheduled Time: </p>
-									<p>Scheduled Date: </p>
+									<p>Your Token No. : <b><?php echo $token ?></b></p>
+									<p>Scheduled Time: <b><?php $today = date("F j, Y");  echo $today ?></b></p>
+									<p>Scheduled Date: <b><?php $todayti = date("g:i a");	echo $todayti ?></b>     </p>
 								</div>
 							</div>
 						</div>
-					-->
-				</section>
-			</div>
-			<!-- end: page -->
-		</section>
-	</div>		
-</section>
+						<footer class="panel-footer">
+							<div class="row">
+								<div class="col-md-12 text-right">
+									<button class="btn btn-success modal-dismiss">OK</button>
+								</div>
+							</div>
+						</footer>
+					</section>
+				</div>
 
-<!-- Vendor -->
-<script src="assets/vendor/jquery/jquery.js"></script>
-<script src="assets/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
-<script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
-<script src="assets/vendor/nanoscroller/nanoscroller.js"></script>
-<script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
-<script src="assets/vendor/magnific-popup/magnific-popup.js"></script>
-<script src="assets/vendor/jquery-placeholder/jquery.placeholder.js"></script>
+				<!-- end: page -->
+			</section>
+		</div>		
+	</section>
 
-<!-- Specific Page Vendor -->
-<script src="assets/vendor/select2/select2.js"></script>
-<script src="assets/vendor/pnotify/pnotify.custom.js"></script>
+	<!-- Vendor -->
+	<script src="assets/vendor/jquery/jquery.js"></script>
+	<script src="assets/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
+	<script src="assets/vendor/nanoscroller/nanoscroller.js"></script>
+	<script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+	<script src="assets/vendor/magnific-popup/magnific-popup.js"></script>
+	<script src="assets/vendor/jquery-placeholder/jquery.placeholder.js"></script>
 
-<!-- Theme Base, Components and Settings -->
-<script src="assets/javascripts/theme.js"></script>
+	<!-- Specific Page Vendor -->
+	<script src="assets/vendor/select2/select2.js"></script>
+	<script src="assets/vendor/pnotify/pnotify.custom.js"></script>
 
-<!-- Theme Custom -->
-<script src="assets/javascripts/theme.custom.js"></script>
+	<!-- Theme Base, Components and Settings -->
+	<script src="assets/javascripts/theme.js"></script>
 
-<!-- Theme Initialization Files -->
-<script src="assets/javascripts/theme.init.js"></script>
+	<!-- Theme Custom -->
+	<script src="assets/javascripts/theme.custom.js"></script>
+
+	<!-- Theme Initialization Files -->
+	<script src="assets/javascripts/theme.init.js"></script>
 
 
-<!-- Examples -->
-<script src="assets/javascripts/ui-elements/examples.modals.js"></script>
+	<!-- Examples -->
+	<script src="assets/javascripts/ui-elements/examples.modals.js"></script>
+				
 </body>
 </html>

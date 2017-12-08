@@ -9,6 +9,7 @@ if (isset($_POST['token']))
 	$phone_number=$_POST['pnum'];
 	$result = $con->prepare("SELECT * FROM signup WHERE token ='".$tokenid."' OR phone_number ='".$phone_number."' ");
 	$result->execute();
+
 	$row = $result->fetch();
 	if($row>0){
 		$_SESSION['token'] = $row['token'];
@@ -19,9 +20,8 @@ if (isset($_POST['token']))
 		sleep(3);
 		header("location:user_profile.php");
 	}
-
 }
 else{
-	echo "fuck";
+	echo "Oops";
 }
 ?>
